@@ -3,58 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MC Skin Studio — Professional</title>
+  <title>MC Skin Studio Pro</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0c0e12;
-      --surface: #14171e;
+      --bg: #0b0d11;
+      --surface: #13161c;
       --surface2: #1a1e27;
-      --border: #2a2f3a;
-      --text: #f1f3f5;
+      --border: #2a303c;
+      --text: #f0f2f5;
       --muted: #8b93a7;
       --accent: #3b82f6;
-      --accent-soft: rgba(59, 130, 246, 0.15);
+      --accent-soft: rgba(59,130,246,.12);
       --success: #22c55e;
       --danger: #ef4444;
       --radius: 14px;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'Inter', system-ui, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      line-height: 1.5;
     }
+    .container { max-width: 1100px; margin: 0 auto; padding: 32px 16px 80px; }
+    header { text-align: center; margin-bottom: 36px; }
+    header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 6px; }
+    header p { color: var(--muted); }
 
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 32px 20px 80px;
-    }
-
-    /* Header */
-    header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    header h1 {
-      font-size: 2.1rem;
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      margin-bottom: 8px;
-    }
-    header p {
-      color: var(--muted);
-      font-size: 1rem;
-    }
-
-    /* Search */
     .search-box {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -62,256 +39,208 @@
       padding: 8px;
       display: flex;
       gap: 8px;
-      margin-bottom: 16px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+      margin-bottom: 14px;
     }
     .search-box input {
       flex: 1;
       background: transparent;
       border: none;
-      padding: 14px 18px;
+      padding: 14px 16px;
       font-size: 1.05rem;
       color: var(--text);
       outline: none;
     }
-    .search-box input::placeholder { color: var(--muted); }
     .search-box button {
       background: var(--accent);
       color: white;
       border: none;
-      padding: 0 28px;
+      padding: 0 26px;
       border-radius: 10px;
       font-weight: 600;
-      font-size: 0.95rem;
       cursor: pointer;
-      transition: 0.2s;
     }
-    .search-box button:hover:not(:disabled) {
-      filter: brightness(1.1);
-    }
-    .search-box button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+    .search-box button:disabled { opacity: .6; cursor: not-allowed; }
 
-    .status {
-      text-align: center;
-      font-size: 0.9rem;
-      color: var(--muted);
-      min-height: 24px;
-      margin-bottom: 20px;
-    }
+    .status { text-align: center; font-size: .9rem; color: var(--muted); min-height: 24px; margin-bottom: 18px; }
     .status.error { color: var(--danger); }
     .status.success { color: var(--success); }
 
-    .recent {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      margin-bottom: 32px;
-    }
+    .recent { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 28px; }
     .recent button {
       background: var(--surface2);
       border: 1px solid var(--border);
       color: var(--muted);
-      padding: 6px 14px;
+      padding: 5px 13px;
       border-radius: 999px;
-      font-size: 0.82rem;
+      font-size: .8rem;
       cursor: pointer;
-      transition: 0.15s;
     }
-    .recent button:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
+    .recent button:hover { border-color: var(--accent); color: var(--accent); }
 
-    /* Profile Card */
     .profile {
       display: none;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 28px;
-      margin-bottom: 32px;
+      padding: 24px;
+      margin-bottom: 28px;
+      gap: 24px;
       align-items: center;
-      gap: 28px;
       flex-wrap: wrap;
     }
     .profile.show { display: flex; }
-
     .profile-avatar {
-      width: 110px;
-      height: 110px;
-      border-radius: 18px;
-      background: var(--surface2);
+      width: 100px; height: 100px;
+      border-radius: 16px;
       image-rendering: pixelated;
+      background: var(--surface2);
       border: 2px solid var(--border);
     }
-
-    .profile-info h2 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .profile-info .uuid {
+    .profile-info h2 { font-size: 1.7rem; margin-bottom: 6px; }
+    .uuid-row {
       font-family: ui-monospace, monospace;
-      font-size: 0.85rem;
+      font-size: .84rem;
       color: var(--muted);
       background: var(--surface2);
       padding: 6px 12px;
       border-radius: 8px;
       display: inline-flex;
-      align-items: center;
       gap: 10px;
+      align-items: center;
+      margin-top: 6px;
+    }
+    .uuid-row button {
+      background: none; border: none; color: var(--accent);
+      cursor: pointer; font-size: .8rem; font-weight: 500;
+    }
+    .cape-badge {
+      display: inline-block;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: .75rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
       margin-top: 8px;
     }
-    .profile-info .uuid button {
-      background: none;
-      border: none;
-      color: var(--accent);
-      cursor: pointer;
-      font-size: 0.8rem;
-      font-weight: 500;
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 28px 0 14px;
+      color: var(--text);
     }
 
-    /* Grid */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 18px;
-      margin-bottom: 32px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
     }
-
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
-      transition: border-color 0.2s, transform 0.2s;
     }
-    .card:hover {
-      border-color: #3a4255;
-      transform: translateY(-2px);
-    }
-
     .card-top {
-      padding: 14px 16px;
+      padding: 12px 14px;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: .88rem;
       border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
-
     .card-preview {
-      height: 200px;
+      height: 180px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(180deg, #0f1218 0%, #14171e 100%);
-      position: relative;
+      background: #0f1218;
     }
-    .card-preview img,
-    .card-preview canvas {
+    .card-preview img, .card-preview canvas {
       max-width: 90%;
-      max-height: 180px;
+      max-height: 160px;
       image-rendering: pixelated;
     }
-
-    .card-actions {
-      padding: 12px;
-      display: flex;
-      gap: 8px;
-    }
+    .card-actions { padding: 10px; }
     .card-actions button {
-      flex: 1;
-      padding: 9px;
+      width: 100%;
+      padding: 8px;
       border-radius: 8px;
       border: 1px solid var(--border);
       background: var(--surface2);
       color: var(--text);
-      font-size: 0.82rem;
-      font-weight: 500;
+      font-size: .8rem;
       cursor: pointer;
-      transition: 0.15s;
     }
     .card-actions button:hover {
-      background: var(--accent-soft);
       border-color: var(--accent);
       color: var(--accent);
     }
 
-    /* Bottom Actions */
+    .history-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 24px;
+    }
+    .history-box p { color: var(--muted); font-size: .9rem; margin-bottom: 12px; }
+    .history-box a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .history-box a:hover { text-decoration: underline; }
+
     .bottom-actions {
       display: none;
       justify-content: center;
-      gap: 14px;
+      gap: 12px;
       flex-wrap: wrap;
+      margin-top: 10px;
     }
     .bottom-actions.show { display: flex; }
-
     .btn-primary {
       background: var(--accent);
       color: white;
       border: none;
-      padding: 14px 28px;
+      padding: 13px 26px;
       border-radius: 10px;
       font-weight: 600;
-      font-size: 0.95rem;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
     }
-    .btn-primary:hover { filter: brightness(1.08); }
-    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-
     .btn-ghost {
       background: transparent;
       border: 1px solid var(--border);
       color: var(--muted);
-      padding: 14px 24px;
+      padding: 13px 22px;
       border-radius: 10px;
-      font-weight: 500;
       cursor: pointer;
-    }
-    .btn-ghost:hover {
-      border-color: var(--muted);
-      color: var(--text);
     }
 
     .loading {
-      width: 18px;
-      height: 18px;
-      border: 2px solid rgba(255,255,255,0.25);
-      border-top-color: white;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.25);
+      border-top-color: #fff;
       border-radius: 50%;
-      animation: spin 0.65s linear infinite;
+      animation: spin .65s linear infinite;
+      display: inline-block;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    footer {
-      text-align: center;
-      margin-top: 60px;
-      color: var(--muted);
-      font-size: 0.8rem;
-    }
+    footer { text-align: center; margin-top: 50px; color: var(--muted); font-size: .8rem; }
 
-    @media (max-width: 640px) {
-      header h1 { font-size: 1.7rem; }
+    @media (max-width: 600px) {
       .profile { flex-direction: column; text-align: center; }
       .search-box { flex-direction: column; }
-      .search-box button { padding: 14px; }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>MC Skin Studio</h1>
-      <p>Professioneller Skin, Totem & Icon Generator</p>
+      <h1>MC Skin Studio Pro</h1>
+      <p>Skins • Capes • Totems • History</p>
     </header>
 
     <div class="search-box">
@@ -319,41 +248,46 @@
       <button id="searchBtn">Suchen</button>
     </div>
 
-    <div class="status" id="status">Gib einen Username ein</div>
+    <div class="status" id="status">Username eingeben</div>
     <div class="recent" id="recent"></div>
 
-    <!-- Profile -->
     <div class="profile" id="profile">
       <img class="profile-avatar" id="profileAvatar" alt="Avatar">
       <div class="profile-info">
         <h2 id="profileName">—</h2>
-        <div class="uuid">
+        <div class="uuid-row">
           <span id="profileUuid">—</span>
           <button onclick="copyUuid()">Kopieren</button>
         </div>
+        <div id="capeBadge" class="cape-badge" style="display:none;">Cape vorhanden</div>
       </div>
     </div>
 
-    <!-- Results -->
-    <div class="grid" id="grid"></div>
+    <div id="content" style="display:none;">
+      <div class="section-title">Renders & Totem</div>
+      <div class="grid" id="grid"></div>
 
-    <div class="bottom-actions" id="bottomActions">
-      <button class="btn-primary" id="downloadZip">Alles als ZIP herunterladen</button>
-      <button class="btn-ghost" onclick="resetAll()">Zurücksetzen</button>
+      <div class="section-title">Skin History</div>
+      <div class="history-box">
+        <p>Vollständige Skin-History wird von Mojang nicht öffentlich bereitgestellt. Die beste Quelle dafür ist NameMC.</p>
+        <a id="namemcLink" href="#" target="_blank" rel="noopener">Auf NameMC öffnen →</a>
+      </div>
+
+      <div class="bottom-actions" id="bottomActions">
+        <button class="btn-primary" id="downloadZip">Alles als ZIP</button>
+        <button class="btn-ghost" onclick="resetAll()">Zurücksetzen</button>
+      </div>
     </div>
 
-    <footer>
-      Bessere Fallbacks • Moderne APIs • Inspiriert von NameMC & SkinMC
-    </footer>
+    <footer>Mehrere API-Fallbacks • Cape-Support • NameMC History Link</footer>
   </div>
 
   <script>
     const $ = id => document.getElementById(id);
-    let currentName = '';
-    let currentUuid = '';
+    let currentName = '', currentUuid = '', hasCape = false;
     let assets = {};
 
-    // ========== Recent ==========
+    // Recent
     function getRecent() {
       return JSON.parse(localStorage.getItem('mcstudio_recent') || '[]');
     }
@@ -364,8 +298,7 @@
       renderRecent();
     }
     function renderRecent() {
-      const list = getRecent();
-      $('recent').innerHTML = list.map(n => 
+      $('recent').innerHTML = getRecent().map(n =>
         `<button onclick="quickSearch('${n}')">${n}</button>`
       ).join('');
     }
@@ -375,55 +308,73 @@
     }
     renderRecent();
 
-    // ========== Events ==========
-    $('username').addEventListener('keydown', e => {
-      if (e.key === 'Enter') search();
-    });
+    $('username').addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
     $('searchBtn').addEventListener('click', search);
 
-    // ========== Main Search ==========
     async function search() {
       const name = $('username').value.trim();
-      if (!name) {
-        setStatus('Bitte Username eingeben', 'error');
-        return;
-      }
+      if (!name) return setStatus('Bitte Username eingeben', 'error');
 
       const btn = $('searchBtn');
       btn.disabled = true;
-      btn.innerHTML = '<div class="loading"></div>';
+      btn.innerHTML = '<span class="loading"></span>';
       setStatus('Lade Profil...');
-      $('grid').innerHTML = '';
+      $('content').style.display = 'none';
       $('profile').classList.remove('show');
-      $('bottomActions').classList.remove('show');
       assets = {};
+      hasCape = false;
 
       try {
-        // 1. UUID über Mojang holen
-        const profileRes = await fetch(`https://api.mojang.com/users/profiles/minecraft/${encodeURIComponent(name)}`);
-        if (!profileRes.ok) throw new Error('Spieler nicht gefunden');
+        // 1. UUID von Mojang
+        let profile;
+        try {
+          const res = await fetch(`https://api.mojang.com/users/profiles/minecraft/${encodeURIComponent(name)}`);
+          if (!res.ok) throw new Error('not found');
+          profile = await res.json();
+        } catch {
+          // Fallback: Ashcon
+          const res2 = await fetch(`https://api.ashcon.app/mojang/v2/user/${encodeURIComponent(name)}`);
+          if (!res2.ok) throw new Error('Spieler nicht gefunden');
+          const data = await res2.json();
+          profile = { id: data.uuid.replace(/-/g, ''), name: data.username };
+        }
 
-        const profile = await profileRes.json();
         currentName = profile.name;
-        currentUuid = profile.id;
+        currentUuid = profile.id.replace(/-/g, '');
 
-        // Profile anzeigen
+        // 2. Textures (Cape prüfen)
+        try {
+          const sess = await fetch(`https://sessionserver.mojang.com/session/minecraft/profile/${currentUuid}`);
+          if (sess.ok) {
+            const sessData = await sess.json();
+            const texProp = sessData.properties?.find(p => p.name === 'textures');
+            if (texProp) {
+              const tex = JSON.parse(atob(texProp.value));
+              hasCape = !!(tex.textures && tex.textures.CAPE);
+            }
+          }
+        } catch {}
+
+        // Profile UI
         $('profileName').textContent = currentName;
         $('profileUuid').textContent = formatUuid(currentUuid);
-        $('profileAvatar').src = `https://api.mcheads.org/head/${currentUuid}/128`;
+        $('profileAvatar').src = getHeadUrl(currentUuid, 128);
+        $('capeBadge').style.display = hasCape ? 'inline-block' : 'none';
         $('profile').classList.add('show');
         addRecent(currentName);
 
-        setStatus('Generiere Renders...');
+        // NameMC Link
+        $('namemcLink').href = `https://namemc.com/profile/${currentName}`;
 
-        // 2. Cards bauen
+        setStatus('Generiere Renders...');
         await buildCards();
 
+        $('content').style.display = 'block';
         $('bottomActions').classList.add('show');
-        setStatus(`Geladen: <b>${currentName}</b>`, 'success');
+        setStatus(`Geladen: <b>${currentName}</b>${hasCape ? ' • Cape gefunden' : ''}`, 'success');
       } catch (err) {
         console.error(err);
-        setStatus('Spieler nicht gefunden oder temporärer API-Fehler. Versuche es erneut.', 'error');
+        setStatus('Spieler nicht gefunden oder alle APIs blockiert. Versuche es später erneut.', 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = 'Suchen';
@@ -437,19 +388,62 @@
 
     function copyUuid() {
       navigator.clipboard.writeText(formatUuid(currentUuid));
-      setStatus('UUID kopiert!', 'success');
+      setStatus('UUID kopiert', 'success');
     }
 
-    // ========== Build Cards ==========
+    // Mehrere Quellen für Bilder
+    function getHeadUrl(uuid, size = 128) {
+      return `https://api.mcheads.org/head/${uuid}/${size}`;
+    }
+    function getBodyUrl(uuid) {
+      return `https://api.mcheads.org/player/${uuid}/200`;
+    }
+    function getAvatarUrl(uuid, size = 128) {
+      return `https://api.mcheads.org/avatar/${uuid}/${size}`;
+    }
+    // Fallbacks
+    const fallbacks = {
+      head: (uuid) => [
+        `https://api.mcheads.org/head/${uuid}/128`,
+        `https://crafatar.com/avatars/${uuid}?size=128&overlay`,
+        `https://crafthead.net/avatar/${uuid}/128`
+      ],
+      body: (uuid) => [
+        `https://api.mcheads.org/player/${uuid}/200`,
+        `https://crafatar.com/renders/body/${uuid}?scale=6&overlay`,
+        `https://crafthead.net/body/${uuid}/200`
+      ]
+    };
+
+    function loadImageWithFallback(urls) {
+      return new Promise((resolve) => {
+        let i = 0;
+        const tryNext = () => {
+          if (i >= urls.length) return resolve(null);
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = () => { i++; tryNext(); };
+          img.src = urls[i] + (urls[i].includes('?') ? '&' : '?') + 't=' + Date.now();
+        };
+        tryNext();
+      });
+    }
+
     async function buildCards() {
+      $('grid').innerHTML = '';
+
       const items = [
-        { title: 'Body Front', url: `https://api.mcheads.org/player/${currentUuid}/200`, key: 'body' },
-        { title: 'Head', url: `https://api.mcheads.org/head/${currentUuid}/128`, key: 'head' },
-        { title: 'Avatar', url: `https://api.mcheads.org/avatar/${currentUuid}/128`, key: 'avatar' },
-        { title: 'Isometric', url: `https://api.mcheads.org/player/${currentUuid}/180`, key: 'iso' },
-        { title: 'Totem of Undying', type: 'totem', key: 'totem' },
-        { title: 'Icon 64px', url: `https://api.mcheads.org/head/${currentUuid}/64`, key: 'icon64' },
+        { title: 'Body', key: 'body', type: 'body' },
+        { title: 'Head', key: 'head', type: 'head' },
+        { title: 'Avatar', key: 'avatar', type: 'avatar' },
+        { title: 'Totem of Undying', key: 'totem', type: 'totem' },
+        { title: 'Icon 64px', key: 'icon64', type: 'icon' },
       ];
+
+      if (hasCape) {
+        items.push({ title: 'Cape', key: 'cape', type: 'cape' });
+      }
 
       for (const item of items) {
         const card = document.createElement('div');
@@ -462,7 +456,6 @@
           </div>
         `;
         $('grid').appendChild(card);
-
         const preview = $(`preview-${item.key}`);
 
         if (item.type === 'totem') {
@@ -474,122 +467,124 @@
           preview.appendChild(canvas);
           await drawTotem(canvas);
           assets[item.key] = { type: 'canvas', canvas, name: `${currentName}-totem.png` };
-        } else {
+        } else if (item.type === 'cape') {
+          // Cape versuchen
           const img = document.createElement('img');
-          img.alt = item.title;
-          img.src = item.url + '?t=' + Date.now();
-          img.onerror = () => {
-            // Fallback
-            img.src = `https://crafatar.com/renders/body/${currentUuid}?scale=6&overlay`;
-          };
+          img.alt = 'Cape';
+          img.style.maxHeight = '140px';
+          // Cape kommt über Session, wir nutzen einen Proxy-Versuch
+          img.src = `https://crafatar.com/capes/${currentUuid}`;
+          img.onerror = () => { preview.innerHTML = '<span style="color:#8b93a7;font-size:13px">Cape konnte nicht geladen werden</span>'; };
           preview.appendChild(img);
-          assets[item.key] = { type: 'url', url: item.url, name: `${currentName}-${item.key}.png` };
+          assets[item.key] = { type: 'url', url: img.src, name: `${currentName}-cape.png` };
+        } else {
+          let urls = [];
+          if (item.type === 'body') urls = fallbacks.body(currentUuid);
+          else if (item.type === 'head' || item.type === 'icon') urls = fallbacks.head(currentUuid);
+          else urls = [getAvatarUrl(currentUuid, 128)];
+
+          const imgEl = await loadImageWithFallback(urls);
+          if (imgEl) {
+            preview.appendChild(imgEl);
+            assets[item.key] = { type: 'img', img: imgEl, name: `${currentName}-${item.key}.png` };
+          } else {
+            preview.innerHTML = '<span style="color:#8b93a7;font-size:13px">Nicht ladbar</span>';
+          }
         }
       }
     }
 
-    // ========== Totem ==========
     async function drawTotem(canvas) {
       const ctx = canvas.getContext('2d');
       ctx.imageSmoothingEnabled = false;
       ctx.clearRect(0, 0, 64, 64);
 
-      // Totem Base
+      // Base
       ctx.fillStyle = '#E8B923';
-      // Body
       ctx.fillRect(22, 20, 20, 30);
-      // Arms
       ctx.fillRect(8, 24, 14, 8);
       ctx.fillRect(42, 24, 14, 8);
-      // Legs
       ctx.fillRect(24, 48, 8, 12);
       ctx.fillRect(32, 48, 8, 12);
-      // Head plate
+
       ctx.fillStyle = '#C4921A';
       ctx.fillRect(18, 6, 28, 18);
 
-      // Details
       ctx.fillStyle = '#8B6914';
       ctx.fillRect(22, 20, 20, 3);
       ctx.fillRect(28, 36, 8, 3);
 
-      // Player head
-      const head = new Image();
-      head.crossOrigin = 'anonymous';
-      head.src = `https://api.mcheads.org/head/${currentUuid}/32`;
+      // Head
+      const headUrls = fallbacks.head(currentUuid);
+      const headImg = await loadImageWithFallback(headUrls);
+      if (headImg) {
+        ctx.drawImage(headImg, 20, 8, 24, 24);
+      }
 
-      await new Promise((res, rej) => {
-        head.onload = res;
-        head.onerror = rej;
-      });
-
-      ctx.drawImage(head, 20, 8, 24, 24);
-
-      // Border
       ctx.strokeStyle = '#5c4a0f';
       ctx.lineWidth = 1.5;
       ctx.strokeRect(20, 8, 24, 24);
     }
 
-    // ========== Download ==========
     function downloadOne(key) {
       const a = assets[key];
       if (!a) return;
-
-      if (a.type === 'url') {
-        const link = document.createElement('a');
-        link.href = a.url;
-        link.download = a.name;
-        link.target = '_blank';
-        link.click();
-      } else {
-        const link = document.createElement('a');
+      const link = document.createElement('a');
+      if (a.type === 'canvas') {
         link.href = a.canvas.toDataURL('image/png');
-        link.download = a.name;
-        link.click();
+      } else if (a.type === 'img') {
+        // Canvas zeichnen für Download (CORS-sicherer)
+        const c = document.createElement('canvas');
+        c.width = a.img.naturalWidth || 128;
+        c.height = a.img.naturalHeight || 128;
+        c.getContext('2d').drawImage(a.img, 0, 0);
+        link.href = c.toDataURL('image/png');
+      } else {
+        link.href = a.url;
+        link.target = '_blank';
       }
+      link.download = a.name;
+      link.click();
     }
 
     $('downloadZip').addEventListener('click', async () => {
       const btn = $('downloadZip');
       btn.disabled = true;
-      btn.innerHTML = '<div class="loading"></div> ZIP wird erstellt...';
-
+      btn.innerHTML = '<span class="loading"></span> ZIP...';
       try {
         const zip = new JSZip();
         const folder = zip.folder(currentName);
-
         for (const [key, a] of Object.entries(assets)) {
-          if (a.type === 'url') {
-            const res = await fetch(a.url);
-            const blob = await res.blob();
-            folder.file(a.name, blob);
-          } else {
-            const data = a.canvas.toDataURL('image/png').split(',')[1];
-            folder.file(a.name, data, { base64: true });
+          if (a.type === 'canvas') {
+            const b64 = a.canvas.toDataURL('image/png').split(',')[1];
+            folder.file(a.name, b64, { base64: true });
+          } else if (a.type === 'img') {
+            const c = document.createElement('canvas');
+            c.width = a.img.naturalWidth || 128;
+            c.height = a.img.naturalHeight || 128;
+            c.getContext('2d').drawImage(a.img, 0, 0);
+            const b64 = c.toDataURL('image/png').split(',')[1];
+            folder.file(a.name, b64, { base64: true });
           }
         }
-
         const content = await zip.generateAsync({ type: 'blob' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(content);
-        link.download = `${currentName}-skin-pack.zip`;
+        link.download = `${currentName}-pack.zip`;
         link.click();
       } catch (e) {
-        console.error(e);
-        setStatus('ZIP-Fehler', 'error');
+        setStatus('ZIP Fehler', 'error');
       } finally {
         btn.disabled = false;
-        btn.innerHTML = 'Alles als ZIP herunterladen';
+        btn.textContent = 'Alles als ZIP';
       }
     });
 
     function resetAll() {
       $('username').value = '';
-      $('grid').innerHTML = '';
+      $('content').style.display = 'none';
       $('profile').classList.remove('show');
-      $('bottomActions').classList.remove('show');
-      setStatus('Gib einen Username ein');
+      setStatus('Username eingeben');
       assets = {};
     }
 
