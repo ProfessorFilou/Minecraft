@@ -3,65 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MC Skin & Totem Generator</title>
+  <title>MC Skin & Totem Studio</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     :root {
-      --bg: #0f0f0f;
-      --card: #1a1a1a;
-      --accent: #55ff55;
-      --text: #e0e0e0;
-      --border: #333;
+      --bg: #0b0d10;
+      --card: #14171c;
+      --border: #252a33;
+      --text: #e8eaed;
+      --muted: #8b929e;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --success: #22c55e;
+      --danger: #ef4444;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding: 20px;
+      line-height: 1.5;
     }
 
     .container {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
     }
 
     h1 {
-      text-align: center;
-      margin-bottom: 8px;
-      color: var(--accent);
-      font-size: 1.9rem;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      background: linear-gradient(90deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .subtitle {
-      text-align: center;
-      color: #888;
-      margin-bottom: 30px;
+      color: var(--muted);
       font-size: 0.95rem;
     }
 
-    .search-box {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 30px;
+    .search-section {
       background: var(--card);
-      padding: 16px;
-      border-radius: 12px;
       border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 28px;
     }
 
-    input {
+    .search-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    input[type="text"] {
       flex: 1;
-      padding: 12px 16px;
+      min-width: 200px;
+      padding: 14px 18px;
+      border-radius: 10px;
       border: 1px solid var(--border);
-      border-radius: 8px;
-      background: #111;
+      background: #0f1216;
       color: white;
       font-size: 1rem;
     }
@@ -69,166 +81,273 @@
     input:focus {
       outline: none;
       border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
     }
 
     button {
       background: var(--accent);
-      color: #000;
+      color: white;
       border: none;
-      padding: 12px 22px;
-      border-radius: 8px;
+      padding: 14px 24px;
+      border-radius: 10px;
       font-weight: 600;
+      font-size: 0.95rem;
       cursor: pointer;
-      transition: 0.2s;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    button:hover {
-      filter: brightness(1.1);
+    button:hover:not(:disabled) {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
     }
 
     button:disabled {
-      opacity: 0.5;
+      opacity: 0.55;
       cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: #2a2f3a;
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: #353b48;
+    }
+
+    .btn-success {
+      background: var(--success);
+    }
+    .btn-success:hover:not(:disabled) {
+      background: #16a34a;
+    }
+
+    .status {
+      margin-top: 14px;
+      font-size: 0.9rem;
+      color: var(--muted);
+      min-height: 22px;
+    }
+    .status.error { color: var(--danger); }
+    .status.success { color: var(--success); }
+
+    .recent {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .recent span {
+      background: #1e232c;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      border: 1px solid var(--border);
+    }
+    .recent span:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .player-info {
+      display: none;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: none;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .player-info.show { display: flex; }
+
+    .player-info img {
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      image-rendering: pixelated;
+      background: #0f1216;
+    }
+
+    .player-meta h2 {
+      font-size: 1.4rem;
+      margin-bottom: 4px;
+    }
+    .player-meta p {
+      color: var(--muted);
+      font-size: 0.9rem;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 18px;
+      margin-bottom: 30px;
     }
 
     .card {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .card:hover {
+      border-color: #3a4250;
     }
 
-    .card h2 {
-      font-size: 1.1rem;
-      margin-bottom: 16px;
-      color: var(--accent);
-    }
-
-    .preview {
-      background: #111;
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 16px;
-      min-height: 180px;
+    .card-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+      font-size: 0.95rem;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
     }
 
-    .preview img, .preview canvas {
+    .card-body {
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 180px;
+      background: #0f1216;
+    }
+
+    .card-body img, .card-body canvas {
       max-width: 100%;
       image-rendering: pixelated;
     }
 
-    .btn-group {
+    .card-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
       display: flex;
       gap: 8px;
-      justify-content: center;
       flex-wrap: wrap;
     }
 
-    .btn-group button {
-      font-size: 0.85rem;
-      padding: 8px 14px;
+    .card-footer button {
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      flex: 1;
     }
 
-    .status {
-      text-align: center;
-      margin: 20px 0;
-      color: #aaa;
-      min-height: 24px;
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 10px;
     }
 
-    .error {
-      color: #ff5555;
+    .loading {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     footer {
       text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
       margin-top: 40px;
-      color: #555;
-      font-size: 0.85rem;
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 1.6rem; }
+      .search-row { flex-direction: column; }
+      button { width: 100%; justify-content: center; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>MC Skin & Totem Generator</h1>
-    <p class="subtitle">Username eingeben → Skin, Totem und Icons generieren & herunterladen</p>
+    <header>
+      <h1>MC Skin & Totem Studio</h1>
+      <p class="subtitle">Professioneller Generator für Skins, Totems & Icons</p>
+    </header>
 
-    <div class="search-box">
-      <input type="text" id="username" placeholder="Minecraft Username (z.B. Notch)" autocomplete="off">
-      <button id="generateBtn">Generieren</button>
+    <div class="search-section">
+      <div class="search-row">
+        <input type="text" id="username" placeholder="Minecraft Username eingeben..." autocomplete="off" spellcheck="false">
+        <button id="generateBtn">Generieren</button>
+      </div>
+      <div class="status" id="status">Gib einen Username ein und drücke Enter oder klicke auf Generieren</div>
+      <div class="recent" id="recent"></div>
     </div>
 
-    <div class="status" id="status">Gib einen Username ein und klicke auf Generieren</div>
+    <div class="player-info" id="playerInfo">
+      <img id="infoHead" alt="Head">
+      <div class="player-meta">
+        <h2 id="infoName">—</h2>
+        <p id="infoUuid">UUID: —</p>
+      </div>
+    </div>
 
     <div class="grid" id="results" style="display: none;">
-      <!-- Skin -->
-      <div class="card">
-        <h2>Skin (Front)</h2>
-        <div class="preview">
-          <img id="skinFront" alt="Skin Front" style="display:none;">
-        </div>
-        <div class="btn-group">
-          <button onclick="downloadImage('skinFront', 'skin-front.png')">Download Skin</button>
-        </div>
-      </div>
+      <!-- Cards werden per JS gefüllt -->
+    </div>
 
-      <!-- Head -->
-      <div class="card">
-        <h2>Kopf / Icon</h2>
-        <div class="preview">
-          <img id="headIcon" alt="Head" style="display:none; width: 128px;">
-        </div>
-        <div class="btn-group">
-          <button onclick="downloadImage('headIcon', 'head.png')">Download Kopf</button>
-        </div>
-      </div>
-
-      <!-- Totem -->
-      <div class="card">
-        <h2>Totem of Undying</h2>
-        <div class="preview">
-          <canvas id="totemCanvas" width="64" height="64" style="width: 128px; height: 128px;"></canvas>
-        </div>
-        <div class="btn-group">
-          <button onclick="downloadCanvas('totemCanvas', 'totem.png')">Download Totem</button>
-        </div>
-      </div>
-
-      <!-- Body Icon -->
-      <div class="card">
-        <h2>Körper Icon</h2>
-        <div class="preview">
-          <img id="bodyIcon" alt="Body" style="display:none; width: 128px;">
-        </div>
-        <div class="btn-group">
-          <button onclick="downloadImage('bodyIcon', 'body.png')">Download Körper</button>
-        </div>
-      </div>
+    <div class="actions" id="actions" style="display: none;">
+      <button class="btn-success" id="downloadAll">Alles als ZIP herunterladen</button>
+      <button class="btn-secondary" onclick="window.location.reload()">Zurücksetzen</button>
     </div>
 
     <footer>
-      Nutzt öffentliche Skin-APIs • Funktioniert offline nach dem Laden
+      Nutzt mc-heads.net • Funktioniert komplett im Browser • Keine Daten werden gespeichert
     </footer>
   </div>
 
   <script>
-    const usernameInput = document.getElementById('username');
-    const generateBtn = document.getElementById('generateBtn');
-    const statusEl = document.getElementById('status');
-    const resultsEl = document.getElementById('results');
+    const $ = id => document.getElementById(id);
+    const usernameInput = $('username');
+    const generateBtn = $('generateBtn');
+    const statusEl = $('status');
+    const resultsEl = $('results');
+    const playerInfo = $('playerInfo');
+    const actionsEl = $('actions');
+    const recentEl = $('recent');
 
-    // Enter-Taste
-    usernameInput.addEventListener('keypress', (e) => {
+    let currentUsername = '';
+    let currentUuid = '';
+    let generatedAssets = {};
+
+    // Recent searches
+    function loadRecent() {
+      const recent = JSON.parse(localStorage.getItem('mc_recent') || '[]');
+      recentEl.innerHTML = recent.map(u => `<span onclick="quickSearch('${u}')">${u}</span>`).join('');
+    }
+
+    function saveRecent(name) {
+      let recent = JSON.parse(localStorage.getItem('mc_recent') || '[]');
+      recent = [name, ...recent.filter(u => u.toLowerCase() !== name.toLowerCase())].slice(0, 8);
+      localStorage.setItem('mc_recent', JSON.stringify(recent));
+      loadRecent();
+    }
+
+    function quickSearch(name) {
+      usernameInput.value = name;
+      generate();
+    }
+
+    loadRecent();
+
+    usernameInput.addEventListener('keypress', e => {
       if (e.key === 'Enter') generate();
     });
 
@@ -237,114 +356,242 @@
     async function generate() {
       const username = usernameInput.value.trim();
       if (!username) {
-        showStatus('Bitte einen Username eingeben', true);
+        setStatus('Bitte einen Username eingeben', 'error');
         return;
       }
 
+      currentUsername = username;
       generateBtn.disabled = true;
-      showStatus('Lade Skin von ' + username + '...');
+      generateBtn.innerHTML = '<span class="loading"></span> Lädt...';
+      setStatus('Lade Skin-Daten...');
       resultsEl.style.display = 'none';
+      actionsEl.style.display = 'none';
+      playerInfo.classList.remove('show');
+      generatedAssets = {};
 
       try {
-        // 1. Skin Front (mit mc-heads)
-        const skinFrontUrl = `https://mc-heads.net/body/${username}/180`;
-        const headUrl = `https://mc-heads.net/avatar/${username}/128`;
-        const bodyUrl = `https://mc-heads.net/player/${username}/128`;
+        // UUID holen (über mc-heads)
+        const uuidRes = await fetch(`https://mc-heads.net/minecraft/profile/${username}`);
+        if (!uuidRes.ok) throw new Error('Spieler nicht gefunden');
+        const data = await uuidRes.json();
+        currentUuid = data.id || data.uuid || 'Unbekannt';
 
-        // Bilder laden
-        await loadImage('skinFront', skinFrontUrl);
-        await loadImage('headIcon', headUrl);
-        await loadImage('bodyIcon', bodyUrl);
+        // Player Info
+        $('infoName').textContent = data.name || username;
+        $('infoUuid').textContent = `UUID: ${formatUuid(currentUuid)}`;
+        $('infoHead').src = `https://mc-heads.net/avatar/${username}/128`;
+        playerInfo.classList.add('show');
 
-        // 2. Totem generieren
-        await generateTotem(username);
+        saveRecent(username);
+
+        // Assets generieren
+        await buildCards(username);
 
         resultsEl.style.display = 'grid';
-        showStatus(`Fertig! Skin von <b>${username}</b> geladen`);
+        actionsEl.style.display = 'flex';
+        setStatus(`Erfolgreich geladen: <b>${username}</b>`, 'success');
       } catch (err) {
         console.error(err);
-        showStatus('Fehler: Username nicht gefunden oder API nicht erreichbar', true);
+        setStatus('Spieler nicht gefunden oder API nicht erreichbar. Prüfe den Namen.', 'error');
       } finally {
         generateBtn.disabled = false;
+        generateBtn.textContent = 'Generieren';
       }
     }
 
-    function loadImage(id, url) {
-      return new Promise((resolve, reject) => {
-        const img = document.getElementById(id);
-        img.onload = () => {
-          img.style.display = 'block';
-          resolve();
-        };
-        img.onerror = reject;
-        img.src = url + '?t=' + Date.now(); // Cache umgehen
-      });
+    function formatUuid(uuid) {
+      if (!uuid || uuid.length < 32) return uuid;
+      const clean = uuid.replace(/-/g, '');
+      return `${clean.slice(0,8)}-${clean.slice(8,12)}-${clean.slice(12,16)}-${clean.slice(16,20)}-${clean.slice(20)}`;
     }
 
-    async function generateTotem(username) {
-      const canvas = document.getElementById('totemCanvas');
+    async function buildCards(username) {
+      resultsEl.innerHTML = '';
+
+      const cards = [
+        {
+          title: 'Skin Front',
+          type: 'img',
+          src: `https://mc-heads.net/body/${username}/200`,
+          key: 'skin-front',
+          filename: `${username}-skin-front.png`
+        },
+        {
+          title: 'Skin 3D / Isometric',
+          type: 'img',
+          src: `https://mc-heads.net/player/${username}/200`,
+          key: 'skin-3d',
+          filename: `${username}-skin-3d.png`
+        },
+        {
+          title: 'Kopf (Avatar)',
+          type: 'img',
+          src: `https://mc-heads.net/avatar/${username}/128`,
+          key: 'head',
+          filename: `${username}-head.png`
+        },
+        {
+          title: 'Kopf mit Helm',
+          type: 'img',
+          src: `https://mc-heads.net/avatar/${username}/128/helm`,
+          key: 'head-helm',
+          filename: `${username}-head-helm.png`
+        },
+        {
+          title: 'Totem of Undying',
+          type: 'canvas',
+          key: 'totem',
+          filename: `${username}-totem.png`
+        },
+        {
+          title: 'Icon 64×64',
+          type: 'img',
+          src: `https://mc-heads.net/avatar/${username}/64`,
+          key: 'icon-64',
+          filename: `${username}-icon-64.png`
+        }
+      ];
+
+      for (const card of cards) {
+        const el = document.createElement('div');
+        el.className = 'card';
+        el.innerHTML = `
+          <div class="card-header">
+            <span>${card.title}</span>
+          </div>
+          <div class="card-body" id="body-${card.key}"></div>
+          <div class="card-footer">
+            <button class="btn-secondary" onclick="downloadAsset('${card.key}', '${card.filename}')">Download</button>
+          </div>
+        `;
+        resultsEl.appendChild(el);
+
+        const body = document.getElementById(`body-${card.key}`);
+
+        if (card.type === 'img') {
+          const img = document.createElement('img');
+          img.src = card.src + '?t=' + Date.now();
+          img.alt = card.title;
+          img.style.maxHeight = '160px';
+          body.appendChild(img);
+          generatedAssets[card.key] = { type: 'url', url: card.src, filename: card.filename };
+        } else if (card.type === 'canvas') {
+          const canvas = document.createElement('canvas');
+          canvas.width = 64;
+          canvas.height = 64;
+          canvas.style.width = '128px';
+          canvas.style.height = '128px';
+          body.appendChild(canvas);
+          await drawTotem(canvas, username);
+          generatedAssets[card.key] = { type: 'canvas', canvas, filename: card.filename };
+        }
+      }
+    }
+
+    async function drawTotem(canvas, username) {
       const ctx = canvas.getContext('2d');
-
-      // Totem-Vorlage (einfache 64x64 Version)
-      // Wir zeichnen einen klassischen Totem-Look + Kopf des Spielers
-
-      // Hintergrund transparent
+      ctx.imageSmoothingEnabled = false;
       ctx.clearRect(0, 0, 64, 64);
 
-      // Totem Körper (vereinfacht)
-      // Goldene Farbe
+      // Totem Base (klassischer Look)
+      // Körper
       ctx.fillStyle = '#E8B923';
-      ctx.fillRect(20, 8, 24, 48); // Körper
+      ctx.fillRect(22, 18, 20, 32);
+
+      // Kopf-Rahmen
+      ctx.fillStyle = '#C4921A';
+      ctx.fillRect(18, 6, 28, 20);
 
       // Arme
-      ctx.fillRect(8, 20, 12, 8);
-      ctx.fillRect(44, 20, 12, 8);
+      ctx.fillStyle = '#E8B923';
+      ctx.fillRect(8, 22, 14, 7);
+      ctx.fillRect(42, 22, 14, 7);
 
       // Beine
-      ctx.fillRect(22, 48, 8, 12);
-      ctx.fillRect(34, 48, 8, 12);
+      ctx.fillRect(24, 48, 7, 12);
+      ctx.fillRect(33, 48, 7, 12);
 
-      // Kopf des Spielers laden und drauflegen
-      const headImg = new Image();
-      headImg.crossOrigin = 'anonymous';
-      headImg.src = `https://mc-heads.net/avatar/${username}/32`;
+      // Akzente
+      ctx.fillStyle = '#8B6914';
+      ctx.fillRect(22, 18, 20, 3);
+      ctx.fillRect(28, 35, 8, 3);
+
+      // Spielerkopf laden
+      const head = new Image();
+      head.crossOrigin = 'anonymous';
+      head.src = `https://mc-heads.net/avatar/${username}/32`;
 
       await new Promise((resolve, reject) => {
-        headImg.onload = resolve;
-        headImg.onerror = reject;
+        head.onload = resolve;
+        head.onerror = reject;
       });
 
-      // Kopf auf den Totem setzen (etwas größer)
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(headImg, 16, 4, 32, 32);
+      // Kopf einfügen
+      ctx.drawImage(head, 20, 8, 24, 24);
 
-      // Kleiner Rahmen um den Kopf
-      ctx.strokeStyle = '#8B6914';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(16, 4, 32, 32);
+      // Leichter Rahmen
+      ctx.strokeStyle = '#5c4a0f';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(20, 8, 24, 24);
     }
 
-    function downloadImage(id, filename) {
-      const img = document.getElementById(id);
-      if (!img.src) return;
+    function downloadAsset(key, filename) {
+      const asset = generatedAssets[key];
+      if (!asset) return;
 
-      const a = document.createElement('a');
-      a.href = img.src;
-      a.download = filename;
-      a.click();
+      if (asset.type === 'url') {
+        const a = document.createElement('a');
+        a.href = asset.url;
+        a.download = filename;
+        a.target = '_blank';
+        a.click();
+      } else if (asset.type === 'canvas') {
+        const a = document.createElement('a');
+        a.href = asset.canvas.toDataURL('image/png');
+        a.download = filename;
+        a.click();
+      }
     }
 
-    function downloadCanvas(id, filename) {
-      const canvas = document.getElementById(id);
-      const a = document.createElement('a');
-      a.href = canvas.toDataURL('image/png');
-      a.download = filename;
-      a.click();
-    }
+    // ZIP Download
+    $('downloadAll').addEventListener('click', async () => {
+      const btn = $('downloadAll');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loading"></span> ZIP wird erstellt...';
 
-    function showStatus(msg, isError = false) {
+      try {
+        const zip = new JSZip();
+        const folder = zip.folder(currentUsername || 'mc-assets');
+
+        for (const [key, asset] of Object.entries(generatedAssets)) {
+          if (asset.type === 'url') {
+            const res = await fetch(asset.url);
+            const blob = await res.blob();
+            folder.file(asset.filename, blob);
+          } else if (asset.type === 'canvas') {
+            const dataUrl = asset.canvas.toDataURL('image/png');
+            const base64 = dataUrl.split(',')[1];
+            folder.file(asset.filename, base64, { base64: true });
+          }
+        }
+
+        const content = await zip.generateAsync({ type: 'blob' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(content);
+        a.download = `${currentUsername || 'mc'}-assets.zip`;
+        a.click();
+      } catch (e) {
+        console.error(e);
+        alert('Fehler beim Erstellen der ZIP');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Alles als ZIP herunterladen';
+      }
+    });
+
+    function setStatus(msg, type = '') {
       statusEl.innerHTML = msg;
-      statusEl.className = 'status' + (isError ? ' error' : '');
+      statusEl.className = 'status' + (type ? ' ' + type : '');
     }
   </script>
 </body>
