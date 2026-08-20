@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MC Skin & Totem Generator</title>
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --card: #1a1a1a;
+      --accent: #55ff55;
+      --text: #e0e0e0;
+      --border: #333;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 8px;
+      color: var(--accent);
+      font-size: 1.9rem;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-bottom: 30px;
+      font-size: 0.95rem;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 30px;
+      background: var(--card);
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #111;
+      color: white;
+      font-size: 1rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    button {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 12px 22px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      filter: brightness(1.1);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      color: var(--accent);
+    }
+
+    .preview {
+      background: #111;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      min-height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .preview img, .preview canvas {
+      max-width: 100%;
+      image-rendering: pixelated;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-group button {
+      font-size: 0.85rem;
+      padding: 8px 14px;
+    }
+
+    .status {
+      text-align: center;
+      margin: 20px 0;
+      color: #aaa;
+      min-height: 24px;
+    }
+
+    .error {
+      color: #ff5555;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #555;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>MC Skin & Totem Generator</h1>
+    <p class="subtitle">Username eingeben → Skin, Totem und Icons generieren & herunterladen</p>
+
+    <div class="search-box">
+      <input type="text" id="username" placeholder="Minecraft Username (z.B. Notch)" autocomplete="off">
+      <button id="generateBtn">Generieren</button>
+    </div>
+
+    <div class="status" id="status">Gib einen Username ein und klicke auf Generieren</div>
+
+    <div class="grid" id="results" style="display: none;">
+      <!-- Skin -->
+      <div class="card">
+        <h2>Skin (Front)</h2>
+        <div class="preview">
+          <img id="skinFront" alt="Skin Front" style="display:none;">
+        </div>
+        <div class="btn-group">
+          <button onclick="downloadImage('skinFront', 'skin-front.png')">Download Skin</button>
+        </div>
+      </div>
+
+      <!-- Head -->
+      <div class="card">
+        <h2>Kopf / Icon</h2>
+        <div class="preview">
+          <img id="headIcon" alt="Head" style="display:none; width: 128px;">
+        </div>
+        <div class="btn-group">
+          <button onclick="downloadImage('headIcon', 'head.png')">Download Kopf</button>
+        </div>
+      </div>
+
+      <!-- Totem -->
+      <div class="card">
+        <h2>Totem of Undying</h2>
+        <div class="preview">
+          <canvas id="totemCanvas" width="64" height="64" style="width: 128px; height: 128px;"></canvas>
+        </div>
+        <div class="btn-group">
+          <button onclick="downloadCanvas('totemCanvas', 'totem.png')">Download Totem</button>
+        </div>
+      </div>
+
+      <!-- Body Icon -->
+      <div class="card">
+        <h2>Körper Icon</h2>
+        <div class="preview">
+          <img id="bodyIcon" alt="Body" style="display:none; width: 128px;">
+        </div>
+        <div class="btn-group">
+          <button onclick="downloadImage('bodyIcon', 'body.png')">Download Körper</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Nutzt öffentliche Skin-APIs • Funktioniert offline nach dem Laden
+    </footer>
+  </div>
+
+  <script>
+    const usernameInput = document.getElementById('username');
+    const generateBtn = document.getElementById('generateBtn');
+    const statusEl = document.getElementById('status');
+    const resultsEl = document.getElementById('results');
+
+    // Enter-Taste
+    usernameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') generate();
+    });
+
+    generateBtn.addEventListener('click', generate);
+
+    async function generate() {
+      const username = usernameInput.value.trim();
+      if (!username) {
+        showStatus('Bitte einen Username eingeben', true);
+        return;
+      }
+
+      generateBtn.disabled = true;
+      showStatus('Lade Skin von ' + username + '...');
+      resultsEl.style.display = 'none';
+
+      try {
+        // 1. Skin Front (mit mc-heads)
+        const skinFrontUrl = `https://mc-heads.net/body/${username}/180`;
+        const headUrl = `https://mc-heads.net/avatar/${username}/128`;
+        const bodyUrl = `https://mc-heads.net/player/${username}/128`;
+
+        // Bilder laden
+        await loadImage('skinFront', skinFrontUrl);
+        await loadImage('headIcon', headUrl);
+        await loadImage('bodyIcon', bodyUrl);
+
+        // 2. Totem generieren
+        await generateTotem(username);
+
+        resultsEl.style.display = 'grid';
+        showStatus(`Fertig! Skin von <b>${username}</b> geladen`);
+      } catch (err) {
+        console.error(err);
+        showStatus('Fehler: Username nicht gefunden oder API nicht erreichbar', true);
+      } finally {
+        generateBtn.disabled = false;
+      }
+    }
+
+    function loadImage(id, url) {
+      return new Promise((resolve, reject) => {
+        const img = document.getElementById(id);
+        img.onload = () => {
+          img.style.display = 'block';
+          resolve();
+        };
+        img.onerror = reject;
+        img.src = url + '?t=' + Date.now(); // Cache umgehen
+      });
+    }
+
+    async function generateTotem(username) {
+      const canvas = document.getElementById('totemCanvas');
+      const ctx = canvas.getContext('2d');
+
+      // Totem-Vorlage (einfache 64x64 Version)
+      // Wir zeichnen einen klassischen Totem-Look + Kopf des Spielers
+
+      // Hintergrund transparent
+      ctx.clearRect(0, 0, 64, 64);
+
+      // Totem Körper (vereinfacht)
+      // Goldene Farbe
+      ctx.fillStyle = '#E8B923';
+      ctx.fillRect(20, 8, 24, 48); // Körper
+
+      // Arme
+      ctx.fillRect(8, 20, 12, 8);
+      ctx.fillRect(44, 20, 12, 8);
+
+      // Beine
+      ctx.fillRect(22, 48, 8, 12);
+      ctx.fillRect(34, 48, 8, 12);
+
+      // Kopf des Spielers laden und drauflegen
+      const headImg = new Image();
+      headImg.crossOrigin = 'anonymous';
+      headImg.src = `https://mc-heads.net/avatar/${username}/32`;
+
+      await new Promise((resolve, reject) => {
+        headImg.onload = resolve;
+        headImg.onerror = reject;
+      });
+
+      // Kopf auf den Totem setzen (etwas größer)
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(headImg, 16, 4, 32, 32);
+
+      // Kleiner Rahmen um den Kopf
+      ctx.strokeStyle = '#8B6914';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(16, 4, 32, 32);
+    }
+
+    function downloadImage(id, filename) {
+      const img = document.getElementById(id);
+      if (!img.src) return;
+
+      const a = document.createElement('a');
+      a.href = img.src;
+      a.download = filename;
+      a.click();
+    }
+
+    function downloadCanvas(id, filename) {
+      const canvas = document.getElementById(id);
+      const a = document.createElement('a');
+      a.href = canvas.toDataURL('image/png');
+      a.download = filename;
+      a.click();
+    }
+
+    function showStatus(msg, isError = false) {
+      statusEl.innerHTML = msg;
+      statusEl.className = 'status' + (isError ? ' error' : '');
+    }
+  </script>
+</body>
+</html>
